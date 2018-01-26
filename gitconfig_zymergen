@@ -1,0 +1,33 @@
+[user]
+	name = Luke Zulauf
+	email = luke@zymergen.com
+[core]
+	excludesfile = /Users/luke/.gitignore_global
+[credential]
+	helper = osxkeychain
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+[diff]
+	guitool = opendiff
+	tool = vimdiff
+[color]
+	ui = true
+[push]
+	default = simple
+[mergetool "p4m"]
+	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[gist]
+	private = true
+[alias]
+	modified = ls-files -m
+	conflicts = diff --name-only --diff-filter=U
+	branch-history = for-each-ref --count=20 --sort=-committerdate refs/heads/ --format=\\'%(refname:short)\\'
+	bug-branch = "!f() { git fetch; git checkout -b $1 ; git push --set-upstream origin $1; }; f"
+	rebase-squash = "!git rebase -i `git merge-base origin/master HEAD`"
+	delete-merged-branches = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+	delete-merged-branches-force = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -D"
+	switch = !git_switch.py

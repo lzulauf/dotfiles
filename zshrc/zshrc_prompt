@@ -1,0 +1,256 @@
+# following obtained from: http://aperiodic.net/phil/prompt/
+# Then modified heavily :)
+function precmd {
+
+    # When a program runs for a long time, notify of it's completion
+    if [[ -n "$EXEC_TIME_START" ]]; then
+      CUR_TIME=`date "+%s"`
+      let DELTA="$CUR_TIME - $EXEC_TIME_START"
+      if (( $DELTA > 15 )); then
+        last=$(echo `history |tail -n1 |head -n1` | sed 's/[0-9]* //')
+        # command -v returns whether or not the program (or alias or function) exists first
+        command -v task_finished.py > /dev/null && task_finished.py "${last}" "$DELTA"
+      fi
+    fi
+
+    local TERMWIDTH
+    (( TERMWIDTH = ${COLUMNS} - 1 ))
+
+
+    ###
+    # Truncate the path if it's too long.
+
+    PR_FILLBAR=""
+    PR_PATHLEN=""
+    PR_CLOCK="%D{%a, %m/%d}"
+
+    #local pathsize=${#${(%):---(%n@%m:%l)---()--}}
+    local pathsize=${#${(%):-%~}}
+    local box="--( )--()--"
+    local titlesize=${#${TITLE}}
+    local boxsize
+    (( boxsize = ${#${box}} ))
+
+    # XXX lzulauf - disabling vim mode.
+    local modesize=0
+    #(( modesize = ${#${VIMODE}} ))
+
+    # I'm putting the clock into envsize
+    FLAVOR_MODE=`git rev-parse --abbrev-ref HEAD 2> /dev/null`
+    flavor="$FLAVOR_MODE"
+    #if [[ $FLAVOR_MODE == "master" ]]; then
+        #flavor=""
+    #fi
+
+    venv="${VIRTUAL_ENV##*/}"
+
+    local envsize=${#${(%):-$CLIENT_NAME$flavor $venv 00:00}}
+
+    if [[ "$modesize + $titlesize + $pathsize + $envsize + $boxsize" -gt $TERMWIDTH ]]; then
+        # Not sure why I had to add -1 here.  Should investigate further
+       (( PR_PATHLEN=$TERMWIDTH - $envsize - $boxsize - $titlesize - $modesize - 1 ))
+    else
+        local used
+        (( used = $modesize + $titlesize + $pathsize + $envsize + $boxsize ))
+        # Not sure why I had to add -1 here.  Should investigate further
+        PR_FILLBAR="\${(l.(( $TERMWIDTH - $used - 1 ))..${PR_HBAR}.)}"
+    fi
+
+
+    ###
+    # Get APM info.
+    # XXX lzulauf - Disabling battery percentage as it spews errors
+    #if which ibam > /dev/null; then
+    #pr_apm_result=`ibam --percentbattery`
+    #elif which apm > /dev/null; then
+    #pr_apm_result=`apm`
+    #fi
+}
+
+zmodload zsh/datetime
+
+setopt extended_glob
+preexec () {
+    if [[ "$TERM" == "screen" ]]; then
+    local CMD=${1[(wr)^(*=*|sudo|-*)]}
+    echo -n "\ek$CMD\e\\"
+    fi
+
+    TIME="`strftime "%l:%M%P" $EPOCHSECONDS`"
+    DATE="`strftime "%a, %m/%d" $EPOCHSECONDS`"
+
+    # For use with automatically detecting long running tasks
+    export EXEC_TIME_START=`date "+%s"`
+
+    # Leave a special token (--cmdkey--) at each command prompt so we can
+    # easily jump between commands by searching for that string.
+    CMDKEY="--cmdkey--"
+
+    local TERMWIDTH
+    (( TERMWIDTH = ${COLUMNS} - 1 ))
+
+    local timesize
+    (( timesize = ${#${TIME}} ))
+
+    local cmdkeysize
+    (( cmdkeysize = ${#${CMDKEY}} ))
+
+    local datesize
+    # Need to subtract 1 because Date has an escape slash that's unfortunately counted
+    (( datesize = ${#${DATE}} ))
+
+    local box="|-()-()--()-|"
+    local boxsize
+    (( boxsize = ${#${box}} ))
+
+    local hbar="PR_HBAR"
+
+    local used
+    (( used = $boxsize + $datesize + $timesize + $cmdkeysize))
+
+    local fillbar="\${(l.(( $TERMWIDTH - $used ))..${PR_HBAR}.)}"
+
+    print "$fg[red]$terminfo[enacs]$terminfo[smacs]$terminfo[bold]$PR_LLCORNER$PR_HBAR$terminfo[rmacs]($fg[blue]$TIME$fg[red])$terminfo[smacs]$PR_HBAR($terminfo[rmacs]$CMDKEY$terminfo[smacs])$PR_HBAR${(e)fillbar}$PR_HBAR$terminfo[rmacs]($fg[blue]$DATE$fg[red])$terminfo[smacs]$PR_HBAR$PR_LRCORNER$terminfo[rmacs]$terminfo[sgr0]"
+    print
+
+    (( PR_TITLELEN = 20 ))
+    local titlebar='\033]2;$CLIENT $1\007'
+    print "${(e)titlebar}"
+}
+
+
+setprompt () {
+    ###
+    # Need this so the prompt will work.
+
+    setopt prompt_subst
+
+
+    ###
+    # See if we can use colors.
+
+    autoload colors zsh/terminfo
+    if [[ "$terminfo[colors]" -ge 8 ]]; then
+        colors
+    fi
+
+    for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
+        eval PR_BOLD_$color='%{$terminfo[bold]$fg[${(L)color}]%}'
+        eval PR_$color='%{$terminfo[sgr0]$fg[${(L)color}]%}'
+        eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
+    done
+
+    PR_NO_COLOUR="%{$terminfo[sgr0]%}"
+
+
+    ###
+    # See if we can use extended characters to look nicer.
+
+
+    typeset -A altchar
+    set -A altchar ${(s..)terminfo[acsc]}
+    PR_SET_CHARSET="%{$terminfo[enacs]%}"
+    PR_SHIFT_IN="%{$terminfo[smacs]%}"
+    PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
+    PR_HBAR=${altchar[q]:--}
+    PR_VBAR=${altchar[x]:-|}
+    PR_ULCORNER=${altchar[l]:--}
+    PR_LLCORNER=${altchar[m]:--}
+    PR_LRCORNER=${altchar[j]:--}
+    PR_URCORNER=${altchar[k]:--}
+    PR_RTEE=${altchar[t]:-+}
+    PR_LTEE=${altchar[u]:-+}
+
+    if [[ "$solarized" == 1 ]]; then
+        PR_OUTERBORDER=$PR_BOLD_RED
+        PR_INNERBORDER=$PR_BOLD_RED
+        PR_COLOR1=$PR_BLUE
+        PR_COLOR2=$PR_BLUE
+        PR_COLOR3=$PR_GREEN
+        PR_COLOR4=$PR_GREEN
+    else
+        PR_OUTERBORDER=$PR_BOLD_RED
+        PR_INNERBORDER=$PR_BOLD_RED
+        PR_COLOR1=$PR_BOLD_GREEN
+        PR_COLOR2=$PR_BOLD_GREEN
+        PR_COLOR3=$PR_BOLD_BLUE
+        PR_COLOR4=$PR_BOLD_BLUE
+    fi
+
+    ###
+    # Decide if we need to set titlebar text.
+
+    #case $TERM in
+    #xterm*)
+    #    PR_TITLEBAR=$'%{\e]0;%(!.-=*[ROOT]*=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\a%}'
+    #    ;;
+    #screen)
+    #    PR_TITLEBAR=$'%{\e_screen \005 (\005t) | %(!.-=[ROOT]=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\e\\%}'
+    #    ;;
+    #*)
+    #    PR_TITLEBAR=''
+    #    ;;
+    #esac
+
+    # Set the title to the current directory
+    (( PR_TITLELEN = 20 ))
+    PR_TITLEBAR=$'\033]2;$CLIENT %$PR_TITLELEN<...<%/%<<\007'
+
+
+    ###
+    # Decide whether to set a screen title
+    if [[ "$TERM" == "screen" ]]; then
+    PR_STITLE=$'%{\ekzsh\e\\%}'
+    else
+    PR_STITLE=''
+    fi
+
+    ###
+    # APM detection
+    # XXX lzulauf - disabling battery meter as it spews errors
+    #if which ibam > /dev/null; then
+    #PR_APM='$PR_RED${${PR_APM_RESULT[(f)1]}[(w)-2]}%%(${${PR_APM_RESULT[(f)3]}[(w)-1]})$PR_BLUE:'
+    #elif which apm > /dev/null; then
+    #PR_APM='$PR_RED${PR_APM_RESULT[(w)5,(w)6]/\% /%%}$PR_BLUE:'
+    #else
+    PR_APM=''
+    #fi
+
+
+    ###
+    # Finally, the prompt.
+
+    # TODO Add program output display
+    # ie: %(?..$PR_RED%?$PR_INNERBORDER:)\
+
+    PROMPT='\
+
+$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
+$PR_OUTERBORDER$PR_SHIFT_IN$PR_ULCORNER$PR_INNERBORDER$PR_HBAR$PR_SHIFT_OUT(\
+$PR_COLOR1%(!.%SROOT%s.)$PR_COLOR3$TITLE$CLIENT_NAME $flavor $venv $PR_COLOR1%$PR_PATHLEN<...<%~%<<\
+$PR_INNERBORDER)$PR_SHIFT_IN$PR_HBAR$PR_OUTERBORDER$PR_HBAR${(e)PR_FILLBAR}$PR_INNERBORDER$PR_HBAR$PR_SHIFT_OUT(\
+$PR_COLOR3%D{%l:%M}\
+$PR_INNERBORDER)$PR_SHIFT_IN$PR_HBAR$PR_OUTERBORDER$PR_URCORNER$PR_SHIFT_OUT\
+
+$PR_OUTERBORDER$PR_SHIFT_IN$PR_VBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
+#$PR_OUTERBORDER$PR_SHIFT_IN$PR_LLCORNER$PR_INNERBORDER$PR_HBAR$PR_SHIFT_OUT(\
+#%(?..$PR_RED%?$PR_INNERBORDER:)\
+#${(e)PR_APM}%(!.$PR_RED.$PR_COLOR3)%D{%l:%M%P}\
+#$PR_INNERBORDER)\
+#$PR_NO_COLOUR '
+
+    RPROMPT=' $PR_OUTERBORDER$PR_SHIFT_IN$PR_VBAR$PR_SHIFT_OUT$PR_NO_COLOUR'
+
+#    RPROMPT=' $PR_INNERBORDER\
+#($PR_COLOR4$PR_CLOCK$PR_INNERBORDER)$PR_SHIFT_IN$PR_HBAR$PR_OUTERBORDER$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
+
+#    PS2='$PR_OUTERBORDER$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+#$PR_INNERBORDER$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
+#$PR_GREEN%_$PR_INNERBORDER)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+#$PR_OUTERBORDER$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
+
+    PS2='$PR_OUTERBORDER$PR_SHIFT_IN$PR_VBAR$PR_SHIFT_OUT $PR_GREEN>>>$PR_NO_COLOUR '
+    RPS2=' $PR_INNERBORDER$PR_GREEN%_$PR_INNERBORDER$PR_OUTERBORDER$PR_SHIFT_IN$PR_VBAR$PR_SHIFT_OUT$PR_NO_COLOUR'
+}
+
+setprompt

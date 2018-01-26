@@ -1,0 +1,99 @@
+# All exported environment variables placed in ~/.zshenv 
+
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.zshhistfile
+HISTSIZE=1000
+SAVEHIST=1000
+
+setopt aliases          # Support aliases
+setopt alwayslastprompt
+setopt appendhistory    # Append to history file when shell is closed
+setopt autolist         # If autocomplete finds multiple results, show the list of potential matches
+setopt autoparamkeys
+setopt autoparamslash   # Always add a slash when autocompleting folder names
+setopt autopushd        # Always append directories to the directory stack when changing directories
+setopt autoremoveslash  # Automatically remove trailing slashes from folder paths when executing a command
+setopt banghist
+setopt autolist         # Show autocompletion after first tab
+#setopt bashautolist     # Show autocompletion after second tab
+setopt caseglob         # Glob matches care case-sensitive
+setopt checkjobs        # Warn user about exiting if there are background tasks running
+setopt clobber          # Allow redirection to create/clobber files
+setopt glob             # Allow glob file matching
+setopt histignoredups   # Don't append duplicate history entries
+setopt nonomatch 
+setopt noautocd         # Don't change directories if a directory name was provided with no cd command
+setopt noautomenu
+setopt nobadpattern     # Don't print an error if a bad filename was provided
+setopt nobeep           # Don't beep at the user.
+setopt nobgnice         # Don't run background jobs with lower priority
+setopt noextendedglob   # Don't use extended globs, which caused # in perforce commands to try to match filename.
+setopt nomenucomplete   # Don't autocomplete first item, just autocomplete up to what is unique.
+setopt notify           # Notify users of background job status immediately, rather than waiting for prompt to be drawn.
+setopt printexitvalue   # If exit value is not zero, print a message
+setopt pushdsilent      # Don't display directory stack on pushd or popd
+#setopt incappendhistory # Append to history file immediately
+bindkey -v              # vi bindings
+
+# Set up special key bindings
+bindkey '^[OH' vi-beginning-of-line    # Home
+bindkey '^[OF' vi-end-of-line          # End
+bindkey '^[[2~' beep                   # Insert
+bindkey '^[[3~' delete-char            # Del
+bindkey '^[[5~' vi-backward-blank-word # Page Up
+bindkey '^[[6~' vi-forward-blank-word  # Page Down
+bindkey '^?' backward-delete-char      # Backspace
+bindkey '^F' history-incremental-search-backward
+bindkey '^B' history-incremental-search-forward
+
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/Users/luke/.zshrc'
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+
+# ZStyle Setup
+# /usr//bin should be /usr/bin, not /usr/*/bin
+zstyle ':completion:*' squeeze-slashes true
+
+# standard completion behavior
+zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:incremental:*' completer _complete _correct
+zstyle ':completion:predict:*' completer _complete
+
+# tab shouldn't take seconds if we match locally
+zstyle ':completion:*:cd:*' tag-order local-directories path-directories
+
+# show matches in groups and describe groups
+zstyle ':completion:*:matches' group 'yes'
+zstyle ':completion:*:descriptions' format "%B---- %d%b"
+zstyle ':completion:*:messages' format '%B%U---- %d%u%b'
+zstyle ':completion:*:warnings' format '%B%U---- no match for: %d%u%b'
+
+# don't know what these do yet
+#zstyle ':completion:*:options' description 'yes'
+#zstyle ':completion:*:options' auto-description '%d'
+
+# colorize matches
+zstyle ':completion:*' list-colors "$LS_COLORS"
+
+# match process names to PIDs
+zstyle ':completion:*:*:kill:*' verbose no
+
+
+# Vi mode variable
+VIMODE="I "
+function zle-keymap-select {
+    VIMODE="${${KEYMAP/vicmd/C }/(main|viins)/I }"
+    zle reset-prompt
+}
+
+function accept_line {
+    VIMODE='I '
+    builtin zle .accept-line
+}
+
+zle -N accept_line
+zle -N zle-keymap-select
+bindkey -M vicmd "^M" accept_line

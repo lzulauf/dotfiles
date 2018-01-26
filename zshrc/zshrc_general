@@ -1,0 +1,73 @@
+source $( dirname ${(%):-%N} )/zshrc_options
+source $( dirname ${(%):-%N} )/zshrc_prompt
+
+
+export CLICOLOR=1
+export PYTHONSTARTUP=~/.python/startup.py
+
+alias RebuildTags='RebuildPythonTags ; RebuildYamlTags ; RebuildHtmlTags ; RebuildJavascriptTags ; RebuildCssTags'
+alias RebuildHtmlTags='find -L $PWD -iname "*.html" -print -o -iname "*.htm" -print > .htmlfiles.files ; cscope -i .htmlfiles.files -b -q -f .html.cscope ; rm .htmlfiles.files'
+alias RebuildJavascriptTags='find -L $PWD -iname "*.js" -print > .jsfiles.files ; cscope -i .jsfiles.files -b -q -f .js.cscope ; rm .jsfiles.files'
+alias RebuildPythonTags='find -L $PWD -iname "*.py" -print -o -iname "*.pym" -print > .pythonfiles.files ; cscope -i .pythonfiles.files -b -q -f .python.cscope ; rm .pythonfiles.files'
+alias RebuildYamlTags='find -L $PWD -iname "*.yaml" -print -o -iname "*.yml" -print > .yamlfiles.files ; cscope -i .yamlfiles.files -b -q -f .yaml.cscope ; rm .yamlfiles.files'
+alias RebuildCssTags='find -L $PWD -iname "*.css" -print -o -iname "*.scss" -print > .cssfiles.files ; cscope -i .cssfiles.files -b -q -f .css.cscope ; rm .cssfiles.files'
+
+alias ll='ls -l'
+alias la='ls -la'
+alias pd='popd'
+
+function nbserve {
+  port=8000
+  if [ $# -eq 0 ]
+  then
+    echo "nbserve <file> [port]"
+    return 0
+  fi
+  if [ $# -gt 2 ]
+  then
+    echo "nbserve <file> [port]"
+    return 1
+  fi
+  if [ $# -ge 2 ]
+  then
+    port=$2
+  fi
+  notebook=$1
+  jupyter nbconvert --to slides --post serve --ServePostProcessor.port=$port $notebook
+}
+
+function client_internal {
+   export CLIENT_NAME=$1
+   export CLIENT_DIR=~/$1
+   echo $CLIENT_NAME > ~/.client
+   cd $CLIENT_DIR
+}
+
+# default implementation of client
+function client {
+  client_internal $*
+}
+
+function cleanup {
+  git checkout master && git pull && git branch -d $*
+}
+
+function tmux_session {
+  tmux has-session -t $1
+  if [ $? != 0 ]; then
+    tmux new-session -s $1 -d "${@:2}"
+  fi
+  tmux switch-client -t $1
+}
+
+alias agenda="tmux_session agenda nvim"
+
+
+alias ssh_humble='ssh luke.hq.humblebundle.com'
+
+# Tmux setup. Only run if TERM is screen (as opposed to xterm). This indicates
+# we are in a tmux session
+if [[ -n '$TMUX' ]]; then
+  source $( dirname ${(%):-%N} )/zshrc_tmux
+fi
+

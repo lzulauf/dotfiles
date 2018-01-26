@@ -1,0 +1,55 @@
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+######################
+# Virtualenv Functions
+######################
+
+function activate() {
+  virtualenv_name=$1
+  if [[ -z ${virtualenv_name} ]]; then
+    >&2 echo "Activate needs a virtualenv to activate"
+    return 1
+  fi
+
+  virtualenv_dir=~/.virtualenv
+  if [[ -n ${VIRTUALENV_DIR+x} ]]; then
+    virtualenv_dir=$VIRTUALENV_DIR
+  fi
+  if [[ -d $virtualenv_dir/$virtualenv_name ]]; then
+    source $virtualenv_dir/$virtualenv_name/bin/activate
+  else
+    >&2 echo "Directory $virtualenv_dir/$virtualenv_name does not exist"
+    return 1
+  fi
+}
+
+function enable_global_site_directory() {
+  if [[ -z ${VIRTUAL_ENV} ]]; then
+    >&2 echo "A virtualenv must be active"
+    return 1
+  fi
+
+  if [[ -f $VIRTUAL_ENV/lib/python2.7/no-global-site-packages.txt ]]; then
+    rm $VIRTUAL_ENV/lib/python2.7/no-global-site-packages.txt
+  fi
+}
+
+function disable_global_site_directory() {
+  if [[ -z ${VIRTUAL_ENV} ]]; then
+    >&2 echo "A virtualenv must be active"
+    return 1
+  fi
+
+  touch $VIRTUAL_ENV/lib/python2.7/no-global-site-packages.txt
+}
+
+# zsh chpwd hook
+# Automatically activate the virtualenv environment named in the .venv file
+# when you change directories
+# Does not work in bash, though you could try setting it as your prompt command
+# PROMPT_COMMAND=chpwd
+function chpwd() {
+  if [[ -f ".venv" ]]; then
+    activate `cat .venv`
+  fi
+}

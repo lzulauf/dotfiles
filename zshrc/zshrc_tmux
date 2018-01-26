@@ -1,0 +1,20 @@
+
+# Set the client
+tmux show-environment session_client >& /dev/null
+if [ $? -eq 0 ]; then
+  eval "tmux show-environment session_client" >& /dev/null
+  client_internal $session_client
+fi
+
+# Override the client function
+function client {
+  client_internal $*
+  tmux set-environment session_client $CLIENT_NAME
+}
+
+# Add clipboard functionality
+function copy_tmux_to_clipboard {
+  if test -n "`tmux showb 2> /dev/null`"; then
+    tmux saveb -|pbcopy && tmux deleteb
+  fi
+}

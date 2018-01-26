@@ -1,0 +1,99 @@
+source $( dirname ${(%):-%N} )/zshrc_general
+source $( dirname ${(%):-%N} )/zshrc_virtualenv
+
+export SHELL=/usr/local/bin/zsh
+export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Developer/NVIDIA/CUDA-8.0/bin:/usr/local/texlive/2017/bin/x86_64-darwin
+export EDITOR=/usr/local/bin/nvim
+# export DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-8.0/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}
+export DYLD_LIBRARY_PATH=/usr/local/cuda/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}
+
+alias vim='nvim'
+
+# Backup Stub for when other notify methods not defined
+function notify {
+  echo $*
+}
+
+function notify {
+    if [[ $# == 2 ]]; then
+        terminal-notifier -title "$1" -message "$2"
+    elif [[ $# == 0 ]]; then
+        terminal-notifier -title "`history -1 | cut -d \" \" -f 4-`" -message "$?"
+    else
+        terminal-notifier -message "$*"
+    fi
+}
+
+alias p4merge='/Applications/p4merge.app/Contents/Resources/launchp4merge' # MOVE TO HUMBLE ZONE
+alias diffmerge='/Applications/DiffMerge.app/Contents/MacOS/DiffMerge --nosplash'
+alias pychecker='humblepy /usr/local/lib/python2.7/site-packages/pychecker/checker.py'
+
+# Shortcut for posting
+function  rb {
+  GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` 2> /dev/null
+  rbt post -o --tracking-branch origin/master --branch $GIT_BRANCH --bugs-closed $GIT_BRANCH $*
+}
+
+# Set mac banner notification length to 20 seconds
+# TEMPORARILY DISABLING WHILE WORKING ON WINDOWS
+# defaults write com.apple.notificationcenterui bannerTime 20
+
+export HUMBLEPYSTARTUP=~/.python/humblepy_startup.py
+
+if [[ -z "$GCLOUD_SDK" ]]; then
+  export GCLOUD_SDK=~/google-cloud-sdk
+fi
+
+if [[ -z "$APPENGINE_SDK" ]]; then
+  export APPENGINE_SDK=${GCLOUD_SDK}/platform/google_appengine
+fi
+
+alias mongoose="/Applications/Mongoose.app/Contents/MacOS/Mongoose"
+
+alias clusterf="csshX --login cluster 10.[2-4]0.27.[0-255] --ping_test"
+
+# if [[ -e ~/.humble_bashrc ]]; then
+  # export CLIENT_DIR=~/one
+  # export INCLUDE_JINJA=False
+  # source ~/.humble_bashrc
+# fi
+# export BASE_PYTHONPATH=${PYTHONPATH}
+
+export CLIENT_DIR=~/one
+export PATH="$PATH:$CLIENT_DIR/tools"
+
+function client_internal {
+  OLD_CLIENT_DIR=$CLIENT_DIR
+  export CLIENT_NAME=$1
+  export CLIENT_DIR=~/$1
+  export HUMBLE_ROOT=$CLIENT_DIR
+
+  if [[ -n ${OLD_CLIENT_DIR+x} ]]; then
+    export PATH=`echo $PATH | sed -E "s,:($OLD_CLIENT_DIR|$),:$CLIENT_DIR,1"`
+  fi
+
+  echo $CLIENT_NAME > ~/.client
+  cd $CLIENT_DIR
+}
+
+alias one="tmux_session one"
+alias two="tmux_session two"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f ~/google-cloud-sdk/path.zsh.inc ]; then
+  source ~/google-cloud-sdk/path.zsh.inc
+fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f ~/google-cloud-sdk/completion.zsh.inc ]; then
+  source ~/google-cloud-sdk/completion.zsh.inc
+fi
+
+# Activate our default virtualenv
+activate default
+
+# Set client
+# Do this at the end in case we have anything that triggers
+if [[ -e ~/.client ]]; then
+   client `cat ~/.client`
+fi

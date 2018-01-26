@@ -1,0 +1,7 @@
+*~
+.DS_Store
+ipython_notebooks
+**/flycheck_*
+virtualenv
+**/.tern-port
+**/.ignore
