@@ -5,6 +5,10 @@ export SHELL=/usr/local/bin/zsh
 export EDITOR=/usr/local/bin/nvim
 alias vim='nvim'
 
+# NVM Setup
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm<Paste>
+
 #export CLIENT_DIR=~/one
 export CLIENT_DIR=
 
