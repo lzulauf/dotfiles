@@ -5,3 +5,5 @@ ipython_notebooks
 virtualenv
 **/.tern-port
 **/.ignore
+**/.pytest_cache
+**/__pycache__
