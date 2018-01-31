@@ -62,9 +62,6 @@ function tmux_session {
 
 alias agenda="tmux_session agenda nvim"
 
-
-alias ssh_humble='ssh luke.hq.humblebundle.com'
-
 # Tmux setup. Only run if TERM is screen (as opposed to xterm). This indicates
 # we are in a tmux session
 if [[ -n '$TMUX' ]]; then
