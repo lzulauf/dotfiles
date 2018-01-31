@@ -7,6 +7,7 @@ My configuration files
     1. `ln -s dotfiles/gitconfig .gitconfig`
     1. `ln -s dotfiles/gitignore_global .gitignore_global`
     1. `ln -s dotfiles/python .python`
+    1. `ln -s dotfiles/inputrc .inputrc` (readline setup)
 1. Create .zshrc: `echo "source dotfiles/zshrc/zshrc" > .zshrc`
 1. Create .tmux.conf: `echo "source-file dotfiles/tmux_general.conf" > .tmux.conf`
 1. Brew Installation
