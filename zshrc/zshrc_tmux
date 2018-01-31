@@ -9,7 +9,10 @@ fi
 # Override the client function
 function client {
   client_internal $*
+  # Store in tmux environment vars
   tmux set-environment session_client $CLIENT_NAME
+  # Also store in shell environment vars so that nested shells get the right var
+  export session_client=$CLIENT_NAME
 }
 
 # Add clipboard functionality
