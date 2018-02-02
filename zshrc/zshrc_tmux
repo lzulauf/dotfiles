@@ -3,7 +3,7 @@
 tmux show-environment session_client >& /dev/null
 if [ $? -eq 0 ]; then
   eval "tmux show-environment session_client" >& /dev/null
-  client_internal $session_client
+  # client_internal $session_client --nocd
 fi
 
 # Override the client function

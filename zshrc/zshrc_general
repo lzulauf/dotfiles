@@ -1,7 +1,6 @@
 source $( dirname ${(%):-%N} )/zshrc_options
 source $( dirname ${(%):-%N} )/zshrc_prompt
 
-
 export CLICOLOR=1
 export PYTHONSTARTUP=~/.python/startup.py
 
@@ -37,10 +36,23 @@ function nbserve {
 }
 
 function client_internal {
-   export CLIENT_NAME=$1
-   export CLIENT_DIR=~/$1
-   echo $CLIENT_NAME > ~/.client
-   cd $CLIENT_DIR
+  export CLIENT_NAME=$1
+  export CLIENT_DIR=~/$1
+  echo $CLIENT_NAME > ~/.client
+
+  # Do this _after_ we read $1, otherwise we'll have shifted past it.
+  do_cd="1"
+  while test $# != 0
+  do
+    case "$1" in
+      --nocd) do_cd="0" ;;
+    esac
+    shift
+  done
+
+  if [ "$do_cd" -eq "1" ]; then
+    cd $CLIENT_DIR
+  fi
 }
 
 # default implementation of client
@@ -67,4 +79,3 @@ alias agenda="tmux_session agenda nvim"
 if [[ -n '$TMUX' ]]; then
   source $( dirname ${(%):-%N} )/zshrc_tmux
 fi
-

@@ -1,5 +1,12 @@
 source $( dirname ${(%):-%N} )/zshrc_general
-source $( dirname ${(%):-%N} )/zshrc_virtualenv
+#source $( dirname ${(%):-%N} )/zshrc_virtualenv
+
+export PATH=${PATH}:${HOME}/bin
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+function activate() {
+  source `pipenv --venv`/bin/activate
+}
 
 export SHELL=/usr/local/bin/zsh
 export EDITOR=/usr/local/bin/nvim
@@ -18,5 +25,5 @@ alias two="tmux_session two"
 # Set client
 # Do this at the end in case we have anything that triggers
 if [[ -e ~/.client ]]; then
-   client `cat ~/.client`
+   client `cat ~/.client` --nocd
 fi
