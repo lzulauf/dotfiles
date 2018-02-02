@@ -41,17 +41,19 @@ brew "ruby"
 brew "nvm"
 
 # Java
-# Don't forget to upgrade cryptography:
+# Brew seems to upgrade cryptography to unlimited automatically, so no need to install jce extensions.
 # http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
 cask "caskroom/versions/java8"
 brew "maven"
 # derby must be installed after java8
-brew "derby", restart_service: true
+# unfortunately, this installs derby 10.14, but the zrest integration tests are reliant on 10.13.
+# It will need to be installed manually
+# brew "derby", restart_service: true
 
 # Graphviz
 brew "graphviz"
 
 # Dev Dependencies
-brew "bwa"
-brew "samtools"
+# brew "bwa"
+# brew "samtools"
 brew "imagemagick"
