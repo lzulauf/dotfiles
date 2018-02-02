@@ -1,0 +1,17 @@
+[flake8]
+ignore =
+
+  # indentation not a multiple of four
+  E111, E114, E121, E128,
+
+  C0103,
+  C0111,
+  C0330,
+  W0142,
+  R0911,
+  R0912,
+  R0913,
+  R0914,
+  R0915,
+  E1103
+
