@@ -6,6 +6,9 @@ virtualenv
 **/.tern-port
 **/.ignore
 **/.pytest_cache
-**/__pycache__
-**/Pipfile
-**/Pipfile.lock
+**/__pycache__/
+**/*.pyc
+**/*.cscope
+**/*.cscope.*
+**/*.orig
+**/lukedata

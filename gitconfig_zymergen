@@ -31,3 +31,6 @@
 	delete-merged-branches = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 	delete-merged-branches-force = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -D"
 	switch = !git_switch.py
+	tree = "!tree --prune -I `cat .gitignore ~/.gitignore_global | egrep -v '^#.*$|^[[:space:]]*$' | tr '\n' '|'`"
+	p4m = mergetool -t p4m
+	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
