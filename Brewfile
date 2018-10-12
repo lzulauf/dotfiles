@@ -13,6 +13,8 @@ brew "zsh"
 brew "tmux"
 brew "the_silver_searcher"
 brew "tree"
+brew "terminal-notifier"
+brew "pstree"
 
 # Editor
 brew "neovim"
@@ -21,18 +23,21 @@ brew "neovim"
 brew "git"
 cask "p4merge"
 
+# Browser
+cask "firefox"
+
 # Docker
 cask "virtualbox"
 cask "docker"
 cask "docker-toolbox"
 
 # Mysql
-brew "mysql", restart_service: true
+#brew "mysql", restart_service: true
 cask "mysqlworkbench"
 
 # Python
-brew "python2"
-brew "python3"
+#brew "python2"
+#brew "python3"
 
 # Ruby
 brew "ruby"
@@ -50,6 +55,9 @@ brew "maven"
 # It will need to be installed manually
 # brew "derby", restart_service: true
 
+# Infrastructure
+brew "nmap"
+
 # Graphviz
 brew "graphviz"
 
@@ -57,3 +65,11 @@ brew "graphviz"
 # brew "bwa"
 # brew "samtools"
 brew "imagemagick"
+brew "mongoose"
+brew "pandoc"
+cask "mactex"
+
+# Kubernetes
+brew "kubernetes-cli"
+brew "kubernetes-helm"
+cask "minikube"
