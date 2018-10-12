@@ -1,0 +1,6 @@
+#compdef client
+
+_client () {
+  _alternative 'directories:clients:_path_files -/ -W ~/code/'
+}
+_client "$@"

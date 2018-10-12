@@ -50,6 +50,7 @@ bindkey '^B' history-incremental-search-forward
 # The following lines were added by compinstall
 zstyle :compinstall filename '/Users/luke/.zshrc'
 autoload -Uz compinit
+fpath=($( dirname ${(%):-%N} )/completion $fpath)
 compinit
 # End of lines added by compinstall
 
