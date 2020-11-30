@@ -1,0 +1,22 @@
+format = '$username$hostname$shlvl$kubernetes$directory$git_branch$git_commit$git_state$git_status$hg_branch$docker_context$package$cmake$dart$dotnet$elixir$elm$erlang$golang$helm$java$julia$nim$nodejs$ocaml$perl$php$purescript$python$ruby$rust$swift$terraform$zig$nix_shell$conda$memory_usage$aws$gcloud$env_var$crystal$cmd_duration$custom$line_break[<\(•\)> ](blue)$jobs$battery$time$status$character'
+
+[aws]
+displayed_items = 'profile'
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[line_break]
+disabled = false
+
+[package]
+display_private = true
+disabled = true
+
+[time]
+disabled = false
+
+[git_status]
+stashed = ''
+format = '[$all_status$ahead_behind]($style) '
