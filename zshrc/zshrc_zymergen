@@ -1,29 +1,71 @@
+# Add my bin and pipsi's .local/bin and pyenv's bin to path
+export PATH=${HOME}/.pyenv/bin:${HOME}/.pyenv/shims:${PATH}:${HOME}/bin:${HOME}/.local/bin:/usr/local/sbin
+export PATH="$PATH:$HOME/.rvm/bin"
+export PATH="/usr/local/opt/openssl/bin:$PATH"
+
 source $( dirname ${(%):-%N} )/zshrc_general
-#source $( dirname ${(%):-%N} )/zshrc_virtualenv
+source $( dirname ${(%):-%N} )/zshrc_virtualenv
+source $( dirname ${(%):-%N} )/zshrc_k8s
+source $( dirname ${(%):-%N} )/zshrc_schrodinger
 
-export PATH=${PATH}:${HOME}/bin
-
+export PYENV_ROOT=${HOME}/.pyenv
 export VIRTUAL_ENV_DISABLE_PROMPT=1
-function activate() {
-  source `pipenv --venv`/bin/activate
-}
-
+export NVIM_PY2_PROG="/Users/luke/.local/share/virtualenvs/nvim2-Qkq_gHHF/bin/python2"
+export NVIM_PY3_PROG="/Users/luke/.local/share/virtualenvs/nvim3-bylHiS-m/bin/python3"
 export SHELL=/usr/local/bin/zsh
 export EDITOR=/usr/local/bin/nvim
+
+# aws cli uses $AWS_PROFILE, while create-temp-aws-keys uses $AWSPROFILE
+export AWS_PROFILE="eng"
+export AWSPROFILE="eng"
+
+# For running programs with matplotlib dependencies. This was an arbitrary
+# choice, but my mac seemed to already have all of the upstream dependencies
+# that the Agg backend needed.
+export MPLBACKEND="Agg"
+
+
+export GID="$GID"
+export UID="$UID"
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
 alias vim='nvim'
 
+if [[ -e ~/.zshrc_secrets ]]; then
+  source ~/.zshrc_secrets
+fi
+
+function zychem_setup() {
+  export ZYCHEM_SERVER="$(minikubeip):$(nodeport zychem-server-service)"
+}
+
+alias docker-killall="docker kill `docker ps -q`"
+alias docker-rmall="docker rm `docker ps -a -q`"
+
+# Add onivim2 alias
+alias ovim='/Applications/Onivim2.app/Contents/MacOS/Oni2 --working-directory .'
+alias ovim-editor='/Applications/Onivim2.app/Contents/MacOS/Oni2_editor --working-directory .'
+
+
 # NVM Setup
+# This is expensive, so only do it if you need it.
+# function nvm_load() {
+#   export NVM_DIR="$HOME/.nvm"
+#   source "/usr/local/opt/nvm/nvm.sh"
+# }
+
+# Or better yet, use the --no-use option.
+# Requires calling `nvm use default` before commands work, though.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm<Paste>
+source "/usr/local/opt/nvm/nvm.sh" --no-use
 
-#export CLIENT_DIR=~/one
-export CLIENT_DIR=
-
-alias one="tmux_session one"
-alias two="tmux_session two"
+# Alias to restart laptop cam in macos
+alias restart-video-camera="sudo killall VDCAssistant"
 
 # Set client
 # Do this at the end in case we have anything that triggers
+export CLIENT_DIR=
 if [[ -e ~/.client ]]; then
    client `cat ~/.client` --nocd
 fi

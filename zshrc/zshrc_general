@@ -1,12 +1,16 @@
-source $( dirname ${(%):-%N} )/zshrc_options
-source $( dirname ${(%):-%N} )/zshrc_prompt
+# Use starship for prompt
+eval "$(starship init zsh)"
+#source $( dirname ${(%):-%N} )/zshrc_prompt
 
+source $( dirname ${(%):-%N} )/zshrc_options
 export CLICOLOR=1
+
 export PYTHONSTARTUP=~/.python/startup.py
 
 alias RebuildTags='RebuildPythonTags ; RebuildYamlTags ; RebuildHtmlTags ; RebuildJavascriptTags ; RebuildCssTags'
 alias RebuildHtmlTags='find -L $PWD -iname "*.html" -print -o -iname "*.htm" -print > .htmlfiles.files ; cscope -i .htmlfiles.files -b -q -f .html.cscope ; rm .htmlfiles.files'
 alias RebuildJavascriptTags='find -L $PWD -iname "*.js" -print > .jsfiles.files ; cscope -i .jsfiles.files -b -q -f .js.cscope ; rm .jsfiles.files'
+alias RebuildJavaTags='find -L $PWD -iname "*.java" -print > .javafiles.files ; cscope -i .javafiles.files -b -q -f .java.cscope ; rm .javafiles.files'
 alias RebuildPythonTags='find -L $PWD -iname "*.py" -print -o -iname "*.pym" -print > .pythonfiles.files ; cscope -i .pythonfiles.files -b -q -f .python.cscope ; rm .pythonfiles.files'
 alias RebuildYamlTags='find -L $PWD -iname "*.yaml" -print -o -iname "*.yml" -print > .yamlfiles.files ; cscope -i .yamlfiles.files -b -q -f .yaml.cscope ; rm .yamlfiles.files'
 alias RebuildCssTags='find -L $PWD -iname "*.css" -print -o -iname "*.scss" -print > .cssfiles.files ; cscope -i .cssfiles.files -b -q -f .css.cscope ; rm .cssfiles.files'
@@ -15,29 +19,12 @@ alias ll='ls -l'
 alias la='ls -la'
 alias pd='popd'
 
-function nbserve {
-  port=8000
-  if [ $# -eq 0 ]
-  then
-    echo "nbserve <file> [port]"
-    return 0
-  fi
-  if [ $# -gt 2 ]
-  then
-    echo "nbserve <file> [port]"
-    return 1
-  fi
-  if [ $# -ge 2 ]
-  then
-    port=$2
-  fi
-  notebook=$1
-  jupyter nbconvert --to slides --post serve --ServePostProcessor.port=$port $notebook
-}
+#alias nbserve="jupyter nbconvert --to slides --reveal-prefix reveal.js --post serve"
+alias nbserve="python -m nbconvert.postprocessors.serve"
 
 function client_internal {
   export CLIENT_NAME=$1
-  export CLIENT_DIR=~/$1
+  export CLIENT_DIR=~/code/$1
   echo $CLIENT_NAME > ~/.client
 
   # Do this _after_ we read $1, otherwise we'll have shifted past it.
@@ -58,10 +45,6 @@ function client_internal {
 # default implementation of client
 function client {
   client_internal $*
-}
-
-function cleanup {
-  git checkout master && git pull && git branch -d $*
 }
 
 function tmux_session {

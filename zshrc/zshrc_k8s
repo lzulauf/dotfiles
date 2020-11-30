@@ -1,0 +1,19 @@
+function kube-activate() {
+  eval $(minikube docker-env)
+  kubectl completion zsh | source /dev/stdin
+  minikube completion zsh | source /dev/stdin
+  helm completion zsh | source /dev/stdin
+}
+export HELM_HOME=~/.helm
+
+function nodeport() {
+  kubectl get -o json service $1 | jq ".spec.ports[].nodePort"
+  # kubectl -n development get -o json service $1 | jq ".spec.ports[].nodePort"
+}
+
+function minikubeip() {
+  echo "http://$(minikube ip)"
+  # echo "https://rancher2.zymergen.net/k8s/clusters/c-p2rtj"
+}
+
+

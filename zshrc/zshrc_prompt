@@ -1,6 +1,13 @@
 # following obtained from: http://aperiodic.net/phil/prompt/
 # Then modified heavily :)
 function precmd {
+    # Check if kubernetes is running
+    # local $KUBE
+    if [[ "$KUBERNETES_ACTIVE" -eq "True" ]]; then
+        
+
+    fi
+
 
     # When a program runs for a long time, notify of it's completion
     if [[ -n "$EXEC_TIME_START" ]]; then
