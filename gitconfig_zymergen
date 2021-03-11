@@ -15,6 +15,11 @@
 	ui = true
 [push]
 	default = simple
+[difftool "p4d"]
+	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
 [mergetool "p4m"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
 	keepTemporaries = false
@@ -37,6 +42,8 @@
 	switcher = !git_switch.py
 	tree = "!tree --prune -I `cat .gitignore ~/.gitignore_global | egrep -v '^#.*$|^[[:space:]]*$' | tr '\n' '|'`"
 	unstage = reset HEAD
-	ignored = check-ignore
+	ignored = "!f() { \
+		find $@ | git check-ignore --stdin; \
+	}; f"
 [pull]
 	ff = only
