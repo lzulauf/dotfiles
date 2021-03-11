@@ -63,6 +63,11 @@ source "/usr/local/opt/nvm/nvm.sh" --no-use
 # Alias to restart laptop cam in macos
 alias restart-video-camera="sudo killall VDCAssistant"
 
+# AWS ECR login
+function aws-ecr-login() {
+  aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 703076520410.dkr.ecr.us-west-2.amazonaws.com
+}
+
 # Set client
 # Do this at the end in case we have anything that triggers
 export CLIENT_DIR=
