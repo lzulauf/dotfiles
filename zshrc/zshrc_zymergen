@@ -17,12 +17,15 @@ export EDITOR=/usr/local/bin/nvim
 
 # aws cli uses $AWS_PROFILE, while create-temp-aws-keys uses $AWSPROFILE
 export AWS_PROFILE="eng"
-export AWSPROFILE="eng"
+#export AWSPROFILE="eng"
 
 # For running programs with matplotlib dependencies. This was an arbitrary
 # choice, but my mac seemed to already have all of the upstream dependencies
 # that the Agg backend needed.
 export MPLBACKEND="Agg"
+
+#alias docker='nerdctl'
+#export DOCKER_COMPOSE_PROGRAM="nerdctl compose"
 
 
 export GID="$GID"
@@ -74,3 +77,19 @@ export CLIENT_DIR=
 if [[ -e ~/.client ]]; then
    client `cat ~/.client` --nocd
 fi
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/usr/local/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+        . "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+    else
+        export PATH="/usr/local/Caskroom/miniconda/base/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

@@ -18,6 +18,7 @@ brew "pstree"
 
 # Editor
 brew "neovim"
+brew "basictex"  # for WikiExport
 
 # Version Control
 brew "git"
