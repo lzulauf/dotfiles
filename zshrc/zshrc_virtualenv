@@ -7,12 +7,40 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 function activate() {
   virtualenv_name=$1
   if [[ -z ${virtualenv_name} ]]; then
-    # Assume there's a pipenv available
-    pipenv_venv="$(pipenv --venv)"
-    if [ $? = 0 ]; then
-      source ${pipenv_venv}/bin/activate
-      return 0
+
+    # If pipenv is installed, see if we can use it to find a virtualenv
+    if hash pipenv 2>/dev/null; then
+      # Assume there's a pipenv available
+      pipenv_venv="$(pipenv --venv 2>/dev/null)"
+      if [ $? = 0 ]; then
+        echo "Using pipenv venv ${pipenv_venv}"
+        source ${pipenv_venv}/bin/activate
+        return 0
+      fi
     fi
+
+    # If poetry is installed, see if we can use it to find a virtualenv
+    if hash poetry 2>/dev/null; then
+      # Poetry does not have an easy way to access the version without parsing.
+      # The output of poetry show -v is many lines, but the first line looks
+      # like:
+      # Using virtualenv: /Users/luke/Library/Caches/pypoetry/virtualenvs/bgc-program-tracking-D6tnnA03-py3.10
+      # If we run the output directly through head, head will close the pipe
+      # while it is still being written to. If, on the other hand, we have tail
+      # read the full pipe and then pass the output to head, tail will not
+      # complain about the pipe being closed.
+      # We can then extract the first line, cut on spaces, and retrieve the
+      # third "word" (the path). This will fail if any spaces exist in the path
+      # name, th ough.
+      poetry_output="$(poetry show -v)"
+      if [ $? = 0 ]; then
+        poetry_venv="$(echo $poetry_output | head -n 1 | cut -d ' ' -f 3)"
+        echo "Using poetry venv ${poetry_venv}"
+        source ${poetry_venv}/bin/activate
+        return 0
+      fi
+    fi
+
   fi
 
   virtualenv_dir=~/.virtualenvs
@@ -50,6 +78,15 @@ function disable_global_site_directory() {
   fi
 
   touch $VIRTUAL_ENV/lib/python2.7/no-global-site-packages.txt
+}
+
+function ipython() {
+  site_dir=$(python -c "import site; print(next(iter(site.getsitepackages()), ''))")
+  PREFIX=""
+  if [[ -n $site_dir && -d $site_dir ]]; then
+      PREFIX=$site_dir
+  fi
+  PYTHONPATH=$PREFIX /usr/bin/env ipython
 }
 
 # zsh chpwd hook
