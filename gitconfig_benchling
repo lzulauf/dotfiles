@@ -1,8 +1,9 @@
 [user]
 	name = Luke Zulauf
-	email = luke@zymergen.com
+	email = luke.zulauf@benchling.com
 [core]
-	excludesfile = /Users/luke/.gitignore_global
+	excludesfile = /Users/luke.zulauf/.gitignore_global
+	trustctime = false
 [credential]
 	helper = osxkeychain
 [merge]
@@ -15,13 +16,30 @@
 	ui = true
 [push]
 	default = simple
+[difftool]
+	prompt = false
 [difftool "p4d"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"
 	keepTemporaries = false
 	trustExitCode = false
 	keepBackup = false
+[difftool "diffmerge"]
+	cmd = /Applications/DiffMerge/Contents/MacOS/DiffMerge "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[difftool "difftastic"]
+  cmd = difft --color=always "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
 [mergetool "p4m"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[mergetool "diffmerge"]
+  cmd = /Applications/DiffMerge/Contents/MacOS/DiffMerge --merge --result="$MERGED" "$LOCAL" "$(if test -f "$BASE"; then echo "$BASE"; else echo "$LOCAL"; fi)" "$REMOTE"'
 	keepTemporaries = false
 	trustExitCode = false
 	keepBackup = false
@@ -38,6 +56,7 @@
 	p4m = mergetool -t p4m
 	patch = format-patch
 	print = "!f() { git show \"$1\":\"${GIT_PREFIX}$2\"; }; f"
+	push-skip = "!SKIP_PRE_PUSH_CHECKS=1 git push"
 	rebase-squash = "!git rebase -i `git merge-base origin/master HEAD`"
 	switcher = !git_switch.py
 	tree = "!tree --prune -I `cat .gitignore ~/.gitignore_global | egrep -v '^#.*$|^[[:space:]]*$' | tr '\n' '|'`"
@@ -53,3 +72,13 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[init]
+	defaultBranch = main
+[include]
+	path = ~/.benchling-dotfiles/.gitconfig
+[includeIf "gitdir:/src/"]
+	path = ~/.config/.gitconfig
+[feature]
+	manyFiles = true
+[fetch]
+	writeCommitGraph = true

@@ -1,0 +1,103 @@
+export PATH=$PATH:${HOME}/bin
+
+# Ruby setup
+# export PATH=/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/3.1.0/bin:$PATH
+# export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
+# export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
+# # export PATH="$PATH:$HOME/.rvm/bin"
+
+# export PATH="/usr/local/opt/openssl/bin:$PATH"
+
+# Android SDK
+export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_SDK_ROOT/emulator
+export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
+
+# Help xcode fine node
+# export NODE_BINARY=/Users/luke.zulauf/.nvm/versions/node/v16.13.1/bin/node
+
+source $( dirname ${(%):-%N} )/zshrc_general
+source $( dirname ${(%):-%N} )/zshrc_virtualenv
+# source $( dirname ${(%):-%N} )/zshrc_k8s
+
+# This is invoked by ~/.zshrc for now because setup_dev_machine puts it there
+# export NVM_LAZY_LOAD=true
+# source ~/.zsh-nvm/zsh-nvm.plugin.zsh
+
+# export PYENV_ROOT=${HOME}/.pyenv
+#
+# This is invoked by ~/.zshrc for now because setup_dev_machine puts it there
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"
+#
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+export NVIM_PY2_PROG="/Users/luke.zulauf/.local/share/virtualenvs/nvim2j   /bin/python2"
+export NVIM_PY3_PROG="/Users/luke.zulauf/.local/share/virtualenvs/nvim3-DjXriX1B/bin/python3"
+# export SHELL=/usr/local/bin/zsh
+export EDITOR=/opt/homebrew/bin/nvim
+
+# export GID="$GID"
+# export UID="$UID"
+# export DOCKER_BUILDKIT=1
+# export COMPOSE_DOCKER_CLI_BUILD=1
+
+# With these set, aws-okta will send a push directly to your phone
+# instead of prompting you to select multi-factor type first.
+export AWS_OKTA_MFA_PROVIDER=okta
+export AWS_OKTA_MFA_FACTOR_TYPE=push
+
+alias vim='nvim'
+
+if [[ -e ~/.zshrc_secrets ]]; then
+  source ~/.zshrc_secrets
+fi
+
+alias docker-killall="docker kill `docker ps -q`"
+alias docker-rmall="docker rm `docker ps -a -q`"
+
+# Or better yet, use the --no-use option.
+# Requires calling `nvm use default` before commands work, though.
+#export NVM_DIR="$HOME/.nvm"
+#source "/opt/homebrew/opt/nvm/nvm.sh" --no-use
+
+
+# Alias to restart laptop cam in macos
+alias restart-video-camera="sudo killall VDCAssistant"
+
+# https://benchling.quip.com/9CENA1gAAtE5/Using-jupyter-notebooks-with-the-devbox-shell
+alias aurelia-jupyter="AURELIA_DOCKER_RUN_ARGS=\"-v $(echo ~/notebooks):/notebooks -p 8888:8888\" dev run devbox jupyter lab /notebooks --no-browser --NotebookApp.token='' --NotebookApp.password=''  --ip=0.0.0.0"
+
+
+# Benchling Code Artifactory setup
+function bca () {
+    echo "Refreshing CodeArtifacts for pypi and poetry"
+    CODEARTIFACT_AUTH_TOKEN=`aws-okta exec integrations-build-ce -- aws codeartifact get-authorization-token --region us-west-2 --domain benchling --query authorizationToken --output text`
+    CODEARTIFACT_URL=`aws-okta exec integrations-build-ce -- aws codeartifact get-repository-endpoint --region us-west-2 --domain benchling --repository ce-apps --format pypi --output text | sed 's~http[s]*://~~g'`
+    CODEARTIFACT_DEV_URL=`aws-okta exec integrations-build-ce -- aws codeartifact get-repository-endpoint --region us-west-2 --domain benchling --repository ce-apps-dev --format pypi --output text | sed 's~http[s]*://~~g'`
+    CODEARTIFACT_USERNAME="aws"
+    echo $CODEARTIFACT_URL
+    echo $CODEARTIFACT_USERNAME
+    export POETRY_HTTP_BASIC_CODEARTIFACT_USERNAME=$CODEARTIFACT_USERNAME
+    export POETRY_HTTP_BASIC_CODEARTIFACT_PASSWORD=$CODEARTIFACT_AUTH_TOKEN
+    export POETRY_HTTP_BASIC_CODEARTIFACT_DEV_USERNAME=$CODEARTIFACT_USERNAME
+    export POETRY_HTTP_BASIC_CODEARTIFACT_DEV_PASSWORD=$CODEARTIFACT_AUTH_TOKEN
+    poetry config repositories.codeartifact "https://${CODEARTIFACT_URL}simple/"
+    poetry config repositories.codeartifact-dev "https://${CODEARTIFACT_DEV_URL}simple/"
+    poetry config http-basic.codeartifact "$CODEARTIFACT_USERNAME" "$CODEARTIFACT_AUTH_TOKEN"
+    poetry config http-basic.codeartifact-dev "$CODEARTIFACT_USERNAME" "$CODEARTIFACT_AUTH_TOKEN"
+    pip config set global.index-url "https://$CODEARTIFACT_USERNAME:$CODEARTIFACT_AUTH_TOKEN@${CODEARTIFACT_URL}simple/"
+    pip config set global.extra-index-url "https://$CODEARTIFACT_USERNAME:$CODEARTIFACT_AUTH_TOKEN@${CODEARTIFACT_DEV_URL}simple/"
+    echo "CodeArtifact Token refreshed. pypi and poetry config updated."
+}
+
+# # AWS ECR login
+# function aws-ecr-login() {
+#   aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 703076520410.dkr.ecr.us-west-2.amazonaws.com
+# }
+
+# Set client
+# Do this at the end in case we have anything that triggers
+export CLIENT_DIR=
+if [[ -e ~/.client ]]; then
+   client `cat ~/.client` --nocd
+fi

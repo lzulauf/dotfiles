@@ -27,6 +27,11 @@ function client_internal {
   export CLIENT_DIR=~/code/$1
   echo $CLIENT_NAME > ~/.client
 
+  # HACK!!
+  if [ "$CLIENT_NAME" == "aurelia" ]; then
+    corepack enable
+  fi
+
   # Do this _after_ we read $1, otherwise we'll have shifted past it.
   do_cd="1"
   while test $# != 0
