@@ -1,5 +1,8 @@
 # Use starship for prompt
-eval "$(starship init zsh)"
+function starship_init {
+  eval "$(starship init zsh)"
+}
+starship_init
 #source $( dirname ${(%):-%N} )/zshrc_prompt
 
 source $( dirname ${(%):-%N} )/zshrc_options
