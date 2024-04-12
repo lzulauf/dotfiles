@@ -53,11 +53,13 @@
 	delete-merged-branches = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 	delete-merged-branches-force = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -D"
 	modified = ls-files -m
+	modified-branch = "!f() { git diff --name-only ${1:-origin/dev} ${2:-}; }; f"
 	p4m = mergetool -t p4m
 	patch = format-patch
 	print = "!f() { git show \"$1\":\"${GIT_PREFIX}$2\"; }; f"
 	push-skip = "!SKIP_PRE_PUSH_CHECKS=1 git push"
-	rebase-squash = "!git rebase -i `git merge-base origin/master HEAD`"
+	rebase-branch = "!f() { git rebase -i `git merge-base ${1:-origin/dev} HEAD`; }; f"
+	rebase-squash = "!f() { git reset --soft `git merge-base ${1:-origin/dev} HEAD`; git commit --edit; }; f"
 	switcher = !git_switch.py
 	tree = "!tree --prune -I `cat .gitignore ~/.gitignore_global | egrep -v '^#.*$|^[[:space:]]*$' | tr '\n' '|'`"
 	unstage = reset HEAD
