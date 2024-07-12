@@ -2,7 +2,7 @@
 	name = Luke Zulauf
 	email = luke.zulauf@benchling.com
 [core]
-	excludesfile = /Users/luke.zulauf/.gitignore_global
+	excludesfile = ~/.config/git/gitignore_global
 	trustctime = false
 [credential]
 	helper = osxkeychain
@@ -18,6 +18,11 @@
 	default = simple
 [difftool]
 	prompt = false
+[difftool "meld"]
+	cmd = meld "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
 [difftool "p4d"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$LOCAL" "$REMOTE"
 	keepTemporaries = false
@@ -29,7 +34,12 @@
 	trustExitCode = false
 	keepBackup = false
 [difftool "difftastic"]
-  cmd = difft --color=always "$LOCAL" "$REMOTE"
+	cmd = difft --color=always "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[mergetool "meld"]
+	cmd = meld --diff "$BASE" "$LOCAL" "$REMOTE" --output "$MERGED"
 	keepTemporaries = false
 	trustExitCode = false
 	keepBackup = false
@@ -39,7 +49,12 @@
 	trustExitCode = false
 	keepBackup = false
 [mergetool "diffmerge"]
-  cmd = /Applications/DiffMerge/Contents/MacOS/DiffMerge --merge --result="$MERGED" "$LOCAL" "$(if test -f "$BASE"; then echo "$BASE"; else echo "$LOCAL"; fi)" "$REMOTE"'
+	cmd = /Applications/DiffMerge/Contents/MacOS/DiffMerge --merge --result="$MERGED" "$LOCAL" "$(if test -f "$BASE"; then echo "$BASE"; else echo "$LOCAL"; fi)" "$REMOTE"'
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[mergetool "kdiff3"]
+	path = /usr/bin/kdiff3
 	keepTemporaries = false
 	trustExitCode = false
 	keepBackup = false
