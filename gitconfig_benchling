@@ -38,11 +38,10 @@
 	keepTemporaries = false
 	trustExitCode = false
 	keepBackup = false
+[mergetool "vimdiff"]
+	# use :cq to quit without committing!
+	layout = "LOCAL,BASE,REMOTE / MERGED + BASE,LOCAL + BASE,REMOTE"
 [mergetool "meld"]
-	cmd = meld --diff "$BASE" "$LOCAL" "$REMOTE" --output "$MERGED"
-	keepTemporaries = false
-	trustExitCode = false
-	keepBackup = false
 [mergetool "p4m"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
 	keepTemporaries = false
