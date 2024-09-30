@@ -46,6 +46,8 @@ export EDITOR=/opt/homebrew/bin/nvim
 export AWS_OKTA_MFA_PROVIDER=okta
 export AWS_OKTA_MFA_FACTOR_TYPE=push
 
+export RUFF_OUTPUT_FORMAT=concise
+
 alias vim='nvim'
 
 if [[ -e ~/.zshrc_secrets ]]; then
@@ -54,6 +56,9 @@ fi
 
 alias docker-killall="docker kill `docker ps -q`"
 alias docker-rmall="docker rm `docker ps -a -q`"
+
+# Add av (aviator) auto-completion
+source <(av completion zsh)
 
 # Or better yet, use the --no-use option.
 # Requires calling `nvm use default` before commands work, though.
