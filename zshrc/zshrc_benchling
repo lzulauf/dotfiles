@@ -60,6 +60,8 @@ alias docker-rmall="docker rm `docker ps -a -q`"
 # Add av (aviator) auto-completion
 source <(av completion zsh)
 
+export SKIP_PRE_PUSH_CHECKS=1
+
 # Or better yet, use the --no-use option.
 # Requires calling `nvm use default` before commands work, though.
 #export NVM_DIR="$HOME/.nvm"
