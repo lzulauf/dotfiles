@@ -67,6 +67,7 @@ export SKIP_PRE_PUSH_CHECKS=1
 #export NVM_DIR="$HOME/.nvm"
 #source "/opt/homebrew/opt/nvm/nvm.sh" --no-use
 
+alias setup-requirements="dev setup requirements && pip install gitpython pynvim"
 
 # Alias to restart laptop cam in macos
 alias restart-video-camera="sudo killall VDCAssistant"
