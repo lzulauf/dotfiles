@@ -1,0 +1,26 @@
+function timer_preexec() {
+  # Set the start timer to current system seconds
+  # Not sure if it needs to avoid this if exectimer is set.
+  # That would imply preexec was called multiple times before precmd...
+  exectimer=${exectimer:-$SECONDS}
+}
+
+function timer_precmd() {
+  if [ "$exectimer" ]; then
+    execdelta=$(($SECONDS - $exectimer))
+
+    if (( $execdelta > 1 )); then
+      # Parse the previous command's program.
+      execlast=$(echo `history |tail -n1 |head -n1` | sed 's/[0-9]* //')
+
+      # Only execute task_finished.py if command can find it successfully
+      command -v task_finished.py > /dev/null && task_finished.py "$execlast" "$execdelta"
+    fi
+
+    unset exectimer
+  fi
+}
+
+add-zsh-hook preexec timer_preexec
+add-zsh-hook precmd timer_precmd
+
