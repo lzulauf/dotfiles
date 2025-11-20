@@ -42,6 +42,7 @@
 	# use :cq to quit without committing!
 	layout = "LOCAL,BASE,REMOTE / MERGED + BASE,LOCAL + BASE,REMOTE"
 [mergetool "meld"]
+	cmd = /bin/meld --output="$MERGED" "$LOCAL" "$(if test -f "$BASE"; then echo "$BASE"; else echo "$LOCAL"; fi)" "$REMOTE"'
 [mergetool "p4m"]
 	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
 	keepTemporaries = false

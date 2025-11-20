@@ -5,10 +5,10 @@
 	excludesfile = ~/.config/git/gitignore_global
 	trustctime = false
 [merge]
-	tool = vimdiff
+	tool = nvimdiff
 	conflictstyle = diff3
 [diff]
-	tool = vimdiff
+	tool = nvimdiff
 [color]
 	ui = true
 	branch = auto
@@ -17,9 +17,17 @@
 	default = simple
 [difftool]
 	prompt = false
-[mergetool "vimdiff"]
+[difftool "meld"]
+	cmd = meld "$LOCAL" "$REMOTE"
+	keepTemporaries = false
+	trustExitCode = false
+	keepBackup = false
+[mergetool "meld"]
+	cmd = meld "$LOCAL" "$(if test -f \"$BASE\"; then echo \"$BASE\"; else echo \"$LOCAL\"; fi)" "$REMOTE"
+[mergetool "nvimdiff"]
 	# use :cq to quit without committing!
 	layout = "LOCAL,BASE,REMOTE / MERGED + BASE,LOCAL + BASE,REMOTE"
+	trustExitCode = false
 [gist]
 	private = true
 [alias]

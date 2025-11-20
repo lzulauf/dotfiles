@@ -19,3 +19,7 @@
 .DS_Store
 .vscode/
 /build/
+**/venv/
+**/.venv/
+**/*.args
+/tags
