@@ -1,0 +1,8 @@
+# Setup
+# mkdir -p ~/.config/ghostty
+# ln -s ~/dotfiles/ghostty_config ~/.config/ghostty/config
+
+font-family = FiraCode Nerd Font Mono
+clipboard-read = allow
+clipboard-write = allow
+copy-on-select = clipboard

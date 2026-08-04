@@ -1,14 +1,21 @@
-export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin:${HOME}/.cargo/bin:${HOME}/.pyenv/bin
+export PATH=${HOME}/.cargo/bin:$PATH:${HOME}/bin:${HOME}/.local/bin:${HOME}/.pyenv/bin
 
 export CLAUDE_MOUNT_DIR=~/code
 export CLAUDE_WORKSPACE=servers
 
+export AI_SANDBOX_WORKSPACE="$HOME/code"
+export AI_SANDBOX_WORKING_DIR="servers"
+
 source $( dirname ${(%):-%N} )/zshrc_general
 source $( dirname ${(%):-%N} )/zshrc_virtualenv
+eval "$(brew shellenv zsh)"
+
 # source $( dirname ${(%):-%N} )/zshrc_k8s
 
 # Enable bash completion commands (e.g. `complete -c`)
 autoload bashcompinit && bashcompinit
+
+export AWS_CONFIG_FILE=~/code/servers/terraform/aws_config
 
 # This is invoked by ~/.zshrc for now because setup_dev_machine puts it there
 # export NVM_LAZY_LOAD=true
@@ -36,7 +43,9 @@ export EDITOR=/snap/bin/nvim
 
 export RUFF_OUTPUT_FORMAT=concise
 
+alias dc='docker compose'
 alias vim='nvim'
+alias k='kubectl'
 
 if [[ -e ~/.zshrc_secrets ]]; then
   source ~/.zshrc_secrets

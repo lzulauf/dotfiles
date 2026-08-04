@@ -37,6 +37,7 @@
 	conflicts = diff --name-only --diff-filter=U
 	delete-merged-branches = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 	delete-merged-branches-force = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -D"
+	merge-commit = "!f() { git log \"$1\"..\"${2:-HEAD}\" --ancestry-path --merges --reverse; }; f"
 	modified = ls-files -m
 	modified-branch = "!f() { git diff --name-only ${1:-origin/dev} ${2:-}; }; f"
 	p4m = mergetool -t p4m
@@ -67,3 +68,5 @@
 	manyFiles = true
 [fetch]
 	writeCommitGraph = true
+[worktree]
+	useRelativePaths = true

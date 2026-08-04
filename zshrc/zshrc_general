@@ -8,8 +8,9 @@ source $( dirname ${(%):-%N} )/zshrc_task_finished
 
 source $( dirname ${(%):-%N} )/zshrc_options
 export CLICOLOR=1
-
 export PYTHONSTARTUP=~/.python/startup.py
+export USER_ID="$(id -u)"
+export GROUP_ID="$(id -g)"
 
 alias RebuildTags='RebuildPythonTags ; RebuildYamlTags ; RebuildHtmlTags ; RebuildJavascriptTags ; RebuildCssTags'
 alias RebuildHtmlTags='find -L $PWD -iname "*.html" -print -o -iname "*.htm" -print > .htmlfiles.files ; cscope -i .htmlfiles.files -b -q -f .html.cscope ; rm .htmlfiles.files'
