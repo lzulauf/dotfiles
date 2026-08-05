@@ -37,6 +37,7 @@
 	conflicts = diff --name-only --diff-filter=U
 	delete-merged-branches = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 	delete-merged-branches-force = "!git checkout master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -D"
+	ignored = "!f() { find $@ | git check-ignore --stdin; }; f"
 	merge-commit = "!f() { git log \"$1\"..\"${2:-HEAD}\" --ancestry-path --merges --reverse; }; f"
 	modified = ls-files -m
 	modified-branch = "!f() { git diff --name-only ${1:-origin/dev} ${2:-}; }; f"
@@ -49,9 +50,6 @@
 	switcher = !git_switch.py
 	tree = "!tree --prune -I `cat .gitignore ~/.gitignore_global | egrep -v '^#.*$|^[[:space:]]*$' | tr '\n' '|'`"
 	unstage = reset HEAD
-	ignored = "!f() { \
-		find $@ | git check-ignore --stdin; \
-	}; f"
 [pull]
 	ff = true
 	rebase = false

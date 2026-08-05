@@ -1,4 +1,4 @@
-export PATH=${HOME}/.cargo/bin:$PATH:${HOME}/bin:${HOME}/.local/bin:${HOME}/.pyenv/bin
+export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin:${HOME}/.cargo/bin
 
 export CLAUDE_MOUNT_DIR=~/code
 export CLAUDE_WORKSPACE=servers
@@ -51,10 +51,10 @@ if [[ -e ~/.zshrc_secrets ]]; then
   source ~/.zshrc_secrets
 fi
 
-# Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+## Pyenv
+#export PYENV_ROOT="$HOME/.pyenv"
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"
 
 
 #alias docker-killall="docker kill `docker ps -q`"
@@ -67,9 +67,9 @@ alias ykf='ssh-add -e /usr/lib/x86_64-linux-gnu/libykcs11.so && ssh-add -s /usr/
 # Set up alsa config path for pygame.midi
 export ALSA_CONFIG_PATH="/usr/share/alsa/alsa.conf"
 
-function input-bridge-start {
-  ~/.pyenv/versions/input_bridge/bin/input-bridge --config ~/Dropbox/code/input_bridge/config.yml -qqq  &
-}
+# function input-bridge-start {
+#   ~/.pyenv/versions/input_bridge/bin/input-bridge --config ~/Dropbox/code/input_bridge/config.yml -qqq  &
+# }
 
 
 # Set client

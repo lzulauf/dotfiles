@@ -17,4 +17,17 @@ My configuration files
     1. Install Brew (https://brew.sh/)
     1. `ln -s dotfiles/Brewfile ~/.Brewfile`
     1. `brew bundle --global`
-  
+1. Claude Code status line
+    1. `mkdir -p ~/.claude`
+    1. `ln -s ~/dotfiles/claude/statusline.sh ~/.claude/statusline.sh`
+    1. Reference it in `~/.claude/settings.json`:
+        ```json
+        {
+          "statusLine": {
+            "type": "command",
+            "command": "~/.claude/statusline.sh"
+          }
+        }
+        ```
+    1. The script shows `<worktree> | <branch> | <model>` (e.g. `🌳 feature-x | feat/foo | 🤖 Opus 4.8`). `📁` marks the main checkout, `🌳` a linked git worktree. Uses `jq` if present, otherwise falls back to `grep`/`sed` (no dependency required).
+
