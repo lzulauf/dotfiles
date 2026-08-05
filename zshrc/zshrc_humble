@@ -62,18 +62,16 @@ alias clusterf="csshX --login cluster 10.[2-4]0.27.[0-255] --ping_test"
 export CLIENT_DIR=~/one
 export PATH="$PATH:$CLIENT_DIR/tools"
 
-function client_internal {
-  OLD_CLIENT_DIR=$CLIENT_DIR
-  export CLIENT_NAME=$1
+# Humble checks out clients under ~/<client> (not ~/code) and juggles PATH.
+# Override the root hook; _context_set (in zshrc_general) does the rest.
+function _context_client_root {
+  local OLD_CLIENT_DIR=$CLIENT_DIR
   export CLIENT_DIR=~/$1
   export HUMBLE_ROOT=$CLIENT_DIR
 
   if [[ -n ${OLD_CLIENT_DIR+x} ]]; then
     export PATH=`echo $PATH | sed -E "s,:($OLD_CLIENT_DIR|$),:$CLIENT_DIR,1"`
   fi
-
-  echo $CLIENT_NAME > ~/.client
-  cd $CLIENT_DIR
 }
 
 alias one="tmux_session one"

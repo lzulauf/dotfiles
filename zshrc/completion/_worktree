@@ -1,0 +1,11 @@
+#compdef worktree
+
+_worktree () {
+  # Existing worktrees for the current client + the command options.
+  local -a wts
+  wts=( ${HOME}/code/worktrees/${CLIENT_NAME}/*(/N:t) )
+  _alternative \
+    "worktrees:worktree:(${wts})" \
+    'options:option:(--list --add --rm --main)'
+}
+_worktree "$@"

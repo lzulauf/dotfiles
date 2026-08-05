@@ -1,18 +1,24 @@
-# Set the client
-tmux show-environment session_client >& /dev/null
-if [ $? -eq 0 ]; then
-  eval "tmux show-environment session_client" >& /dev/null
-  client_internal $session_client #--nocd
-fi
-
-# Override the client function
-function client {
-  client_internal $*
-  # Store in tmux environment vars
-  tmux set-environment session_client $CLIENT_NAME
-  # Also store in shell environment vars so that nested shells get the right var
+# Mirror the active (client, worktree) pair into the tmux session so new panes
+# resume it. Overrides the no-op _context_persist seam from zshrc_general.
+function _context_persist {
+  [[ -n $TMUX ]] || return 0
+  tmux set-environment session_client   $CLIENT_NAME
+  tmux set-environment session_worktree $WORKTREE_NAME
+  # Also export so nested shells inherit without a tmux round-trip.
   export session_client=$CLIENT_NAME
+  export session_worktree=$WORKTREE_NAME
 }
+
+# On shell start inside tmux, restore the session's (client, worktree).
+if tmux show-environment session_client >& /dev/null; then
+  eval "$(tmux show-environment session_client)"
+  eval "$(tmux show-environment session_worktree 2>/dev/null)"
+  if [[ -n ${session_worktree:-} ]]; then
+    _context_set $session_client $session_worktree
+  else
+    _context_set $session_client
+  fi
+fi
 
 # Add clipboard functionality
 function copy_tmux_to_clipboard {

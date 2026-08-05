@@ -1,6 +1,10 @@
 #compdef client
 
 _client () {
-  _alternative 'directories:clients:_path_files -/ -W ~/code/'
+  # Client dirs under ~/code, excluding the 'worktrees' storage sibling.
+  local -a clients
+  clients=( ${HOME}/code/*(/N:t) )
+  clients=( ${clients:#worktrees} )
+  _describe 'client' clients
 }
 _client "$@"
