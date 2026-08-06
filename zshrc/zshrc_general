@@ -160,6 +160,11 @@ function _worktree_list {
 
 function _worktree_switch {
   local wt=$1 dir
+  # The sentinel name isn't a real dir; treat it as "back to the main checkout".
+  if [[ $wt == $CONTEXT_MAIN_WORKTREE ]]; then
+    _context_set $CLIENT_NAME $CONTEXT_MAIN_WORKTREE
+    return
+  fi
   dir=$(_worktree_dir $wt)
   if [[ ! -d $dir ]]; then
     echo "worktree: '$wt' does not exist for '$CLIENT_NAME'." >&2
@@ -196,23 +201,39 @@ function _worktree_remove {
   fi
 }
 
-# Switch between worktrees of the current client.
-#   worktree                list worktrees (also -l/--list)
-#   worktree <name>         switch to an existing worktree
-#   worktree -|--main       switch back to the primary checkout
-#   worktree --add <name> [branch]   create a worktree, then switch
-#   worktree --rm <name>    remove a worktree
+function _worktree_help {
+  cat <<EOF
+worktree — switch between git worktrees of the current client ($CLIENT_NAME)
+
+usage:
+  worktree                     list worktrees (also -l, --list)
+  worktree <name>              switch to an existing worktree
+  worktree $CONTEXT_MAIN_WORKTREE, -, --main   switch back to the primary checkout
+  worktree --add <name> [branch]   create a worktree, then switch to it
+  worktree --rm <name>         remove a worktree (also --remove)
+  worktree -h, --help          show this help
+
+Worktrees live under $WORKTREE_ROOT/<client>/<name>.
+"$CONTEXT_MAIN_WORKTREE" is the sentinel for the primary checkout (\$CLIENT_DIR),
+not a directory on disk.
+EOF
+}
+
+# Switch between worktrees of the current client. See `worktree --help`.
 function worktree {
   local cmd=$1
   case "$cmd" in
     ""|-l|--list)  _worktree_list ;;
+    -h|--help)     _worktree_help ;;
     -|--main)      _context_set $CLIENT_NAME $CONTEXT_MAIN_WORKTREE ;;
     --add)         shift; _worktree_add "$@" ;;
     --rm|--remove) shift; _worktree_remove "$@" ;;
-    -*)            echo "worktree: unknown option $cmd" >&2; return 1 ;;
+    -*)            echo "worktree: unknown option $cmd" >&2; _worktree_help >&2; return 1 ;;
     *)             _worktree_switch "$cmd" ;;
   esac
 }
+
+alias wt="worktree"
 
 function tmux_session {
   tmux has-session -t $1

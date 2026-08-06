@@ -3,9 +3,9 @@
 _worktree () {
   # Existing worktrees for the current client + the command options.
   local -a wts
-  wts=( ${HOME}/code/worktrees/${CLIENT_NAME}/*(/N:t) )
+  wts=( "${CONTEXT_MAIN_WORKTREE:-main}" ${HOME}/code/worktrees/${CLIENT_NAME}/*(/N:t) )
   _alternative \
     "worktrees:worktree:(${wts})" \
-    'options:option:(--list --add --rm --main)'
+    'options:option:(--list --add --rm --main --help)'
 }
 _worktree "$@"

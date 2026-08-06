@@ -50,9 +50,10 @@ Switch worktrees within the current client with `worktree`:
 ```
 worktree                     # list this client's worktrees (also -l/--list)
 worktree feature-x           # switch to an existing worktree
-worktree --main              # switch back to the primary checkout (also -)
+worktree --main              # switch back to the primary checkout (also -, or `worktree main`)
 worktree --add feature-x foo # create ~/code/worktrees/<client>/feature-x on branch foo, then switch
 worktree --rm feature-x      # remove the worktree
+worktree --help              # usage summary (also -h)
 ```
 
 State lives in three scopes:
