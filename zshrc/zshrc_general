@@ -44,8 +44,13 @@ alias nbserve="python -m nbconvert.postprocessors.serve"
 
 # Where linked worktrees live, and the sentinel name for the primary checkout.
 # Under ~/code so they stay derivable and inside CLAUDE_MOUNT_DIR.
-: ${WORKTREE_ROOT:=$HOME/code/worktrees}
-: ${CONTEXT_MAIN_WORKTREE:=main}
+export WORKTREE_ROOT="${WORKTREE_ROOT:-$HOME/code/worktrees}"
+export CONTEXT_MAIN_WORKTREE="${CONTEXT_MAIN_WORKTREE:-main}"
+
+# Where planning documents live: a single global tree, sibling to the clients
+# and the worktree tree under ~/code. Plans are repo-agnostic here and record
+# their target repo/worktree in their own Context section (see plan-use skill).
+export PLANS_ROOT="${PLANS_ROOT:-$HOME/code/plans}"
 CLIENT_WORKTREE_MAP=$HOME/.client_worktrees
 
 # Company hook: resolve the primary-checkout root for a client into CLIENT_DIR
@@ -98,9 +103,14 @@ function _context_set {
   wt=$rest[2]
   [[ -z $client ]] && return 1
 
-  # Guard: the worktree storage dir is a sibling of clients under ~/code.
+  # Guard: the worktree and plans storage dirs are siblings of clients under
+  # ~/code and are not selectable as clients.
   if [[ $client == worktrees ]]; then
     echo "client: 'worktrees' is reserved (worktree storage dir)" >&2
+    return 1
+  fi
+  if [[ $client == plans ]]; then
+    echo "client: 'plans' is reserved (plans storage dir)" >&2
     return 1
   fi
 
@@ -158,6 +168,45 @@ function _worktree_list {
   fi
 }
 
+# One status row: <marker> <name> <branch> <local state> <upstream divergence>.
+# Divergence is read from the tracking ref (last fetch), like `git status` — no
+# network — so it answers "any commits differing from upstream" cheaply.
+function _worktree_status_row {
+  local name=$1 dir=$2 marker branch dirty n counts behind ahead upstream
+  [[ $WORKTREE_NAME == $name ]] && marker="*" || marker=" "
+
+  branch=$(git -C $dir symbolic-ref --quiet --short HEAD 2>/dev/null) || branch="(detached)"
+
+  n=$(git -C $dir status --porcelain 2>/dev/null | grep -c .)
+  [[ $n -gt 0 ]] && dirty="$n changed" || dirty="clean"
+
+  if counts=$(git -C $dir rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null); then
+    read -r behind ahead <<< "$counts"
+    if [[ $ahead == 0 && $behind == 0 ]]; then
+      upstream="up to date"
+    else
+      upstream="↑$ahead ↓$behind"
+    fi
+  else
+    upstream="no upstream"
+  fi
+
+  printf '%s %-20s %-24s %-12s %s\n' "$marker" "$name" "$branch" "$dirty" "$upstream"
+}
+
+# Per-worktree status: uncommitted changes and divergence from upstream.
+function _worktree_status {
+  if [[ -z $CLIENT_NAME ]]; then echo "worktree: no client set" >&2; return 1; fi
+  local base=$WORKTREE_ROOT/$CLIENT_NAME d
+  printf '%s %-20s %-24s %-12s %s\n' ' ' 'WORKTREE' 'BRANCH' 'LOCAL' 'UPSTREAM'
+  _worktree_status_row $CONTEXT_MAIN_WORKTREE $CLIENT_DIR
+  if [[ -d $base ]]; then
+    for d in $base/*(N/); do
+      _worktree_status_row ${d:t} $d
+    done
+  fi
+}
+
 function _worktree_switch {
   local wt=$1 dir
   # The sentinel name isn't a real dir; treat it as "back to the main checkout".
@@ -174,6 +223,29 @@ function _worktree_switch {
   _context_set $CLIENT_NAME $wt
 }
 
+# Wire a freshly-created worktree's branch to a remote so push/pull/status work
+# without a manual --set-upstream. If origin/<branch> already exists we track it;
+# otherwise we pre-set tracking config so the first push lands on origin/<branch>
+# (what push.autoSetupRemote does, but scoped to worktrees we create here).
+function _worktree_setup_upstream {
+  local dir=$1 branch remote
+  branch=$(git -C $dir symbolic-ref --quiet --short HEAD 2>/dev/null) || return 0
+  # Leave an already-tracking branch alone.
+  git -C $dir config --get "branch.$branch.merge" >/dev/null 2>&1 && return 0
+
+  remote=origin
+  git -C $dir remote get-url $remote >/dev/null 2>&1 || remote=$(git -C $dir remote | head -1)
+  [[ -z $remote ]] && return 0
+
+  if git -C $dir rev-parse --quiet --verify "refs/remotes/$remote/$branch" >/dev/null 2>&1; then
+    git -C $dir branch --set-upstream-to="$remote/$branch" "$branch" >/dev/null
+  else
+    git -C $dir config "branch.$branch.remote" "$remote"
+    git -C $dir config "branch.$branch.merge" "refs/heads/$branch"
+  fi
+  echo "worktree: tracking $remote/$branch" >&2
+}
+
 function _worktree_add {
   local wt=$1 branch=$2 dir
   if [[ -z $wt ]]; then echo "usage: worktree --add <name> [branch]" >&2; return 1; fi
@@ -186,6 +258,7 @@ function _worktree_add {
   else
     git -C $CLIENT_DIR worktree add $dir || return 1
   fi
+  _worktree_setup_upstream $dir
   _context_set $CLIENT_NAME $wt
 }
 
@@ -207,9 +280,10 @@ worktree — switch between git worktrees of the current client ($CLIENT_NAME)
 
 usage:
   worktree                     list worktrees (also -l, --list)
+  worktree -s, --status        show each worktree's local + upstream status
   worktree <name>              switch to an existing worktree
   worktree $CONTEXT_MAIN_WORKTREE, -, --main   switch back to the primary checkout
-  worktree --add <name> [branch]   create a worktree, then switch to it
+  worktree --add <name> [branch]   create a worktree (tracking origin), then switch
   worktree --rm <name>         remove a worktree (also --remove)
   worktree -h, --help          show this help
 
@@ -224,6 +298,7 @@ function worktree {
   local cmd=$1
   case "$cmd" in
     ""|-l|--list)  _worktree_list ;;
+    -s|--status|status)  _worktree_status ;;
     -h|--help)     _worktree_help ;;
     -|--main)      _context_set $CLIENT_NAME $CONTEXT_MAIN_WORKTREE ;;
     --add)         shift; _worktree_add "$@" ;;
