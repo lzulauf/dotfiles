@@ -1,5 +1,5 @@
 # Mirror the active (client, worktree) pair into the tmux session so new panes
-# resume it. Overrides the no-op _context_persist seam from zshrc_general.
+# resume it. Overrides the no-op _context_persist seam from zshrc_context.
 function _context_persist {
   [[ -n $TMUX ]] || return 0
   tmux set-environment session_client   $CLIENT_NAME

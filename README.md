@@ -50,6 +50,9 @@ Switch worktrees within the current client with `worktree`:
 ```
 worktree                     # list this client's worktrees (also -l/--list)
 worktree --status            # per-worktree local changes + upstream divergence (also -s)
+worktree --status --all      # same, across every git repo under ~/code
+worktree --status -u         # include untracked files (slower: full working-tree scan)
+worktree -sua                # short flags bundle: same as `worktree -s -u -a`
 worktree feature-x           # switch to an existing worktree
 worktree --main              # switch back to the primary checkout (also -, or `worktree main`)
 worktree --add feature-x foo # create ~/code/worktrees/<client>/feature-x on branch foo, then switch
@@ -59,11 +62,18 @@ worktree --help              # usage summary (also -h)
 
 `--status` lists each worktree with its branch, whether it has uncommitted
 changes (`clean` / `N changed`), and how far it has diverged from its upstream
-(`↑ahead ↓behind`, `up to date`, or `no upstream`). Divergence is read from the
-last-fetched tracking ref, so it is instant and offline — `git fetch` first for
-live numbers. `--add` wires the new worktree's branch to track `origin/<branch>`
-(pre-setting tracking config if the remote branch does not exist yet), so
-`git push`/`pull`/`status` work without a manual `--set-upstream`.
+(`↑ahead ↓behind`, `up to date`, or `no upstream`). Columns are sized to the
+widest value, and on a terminal LOCAL/UPSTREAM are color-coded (green = clean /
+up to date, yellow = changes / diverged, gray = no upstream). By default only tracked
+changes count — the untracked-file scan walks the whole tree and dominates
+runtime, while build output is usually noise; pass `-u`/`--untracked` for the
+full scan. Divergence is read from the last-fetched tracking ref, so it is
+instant and offline — `git fetch` first for live numbers. `--all` runs the same
+check across every git repo under `~/code`; rows are computed in parallel, so
+wall-clock is the slowest single check rather than the sum. `--add` wires the
+new worktree's branch to track `origin/<branch>` (pre-setting tracking config if
+the remote branch does not exist yet), so `git push`/`pull`/`status` work
+without a manual `--set-upstream`.
 
 State lives in three scopes:
 

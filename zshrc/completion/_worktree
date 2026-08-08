@@ -6,6 +6,6 @@ _worktree () {
   wts=( "${CONTEXT_MAIN_WORKTREE:-main}" ${HOME}/code/worktrees/${CLIENT_NAME}/*(/N:t) )
   _alternative \
     "worktrees:worktree:(${wts})" \
-    'options:option:(--list --status --add --rm --main --help)'
+    'options:option:(--list --status --all --untracked --add --rm --main --help)'
 }
 _worktree "$@"
