@@ -3,8 +3,11 @@ export PATH=$PATH:${HOME}/bin:${HOME}/.local/bin:${HOME}/.cargo/bin
 export CLAUDE_MOUNT_DIR=~/code
 export CLAUDE_WORKSPACE=servers
 
+export AI_PLAYGROUND_WORKSPACE="$HOME/code"
+export AI_PLAYGROUND_WORKING_DIR=""
+
 export AI_SANDBOX_WORKSPACE="$HOME/code"
-export AI_SANDBOX_WORKING_DIR="servers"
+export AI_SANDBOX_WORKING_DIR=""
 
 source $( dirname ${(%):-%N} )/zshrc_general
 source $( dirname ${(%):-%N} )/zshrc_virtualenv
@@ -52,8 +55,8 @@ if [[ -e ~/.zshrc_secrets ]]; then
 fi
 
 ## Pyenv
-#export PYENV_ROOT="$HOME/.pyenv"
-#eval "$(pyenv init -)"
+export PYENV_ROOT="$HOME/.pyenv"
+eval "$(pyenv init -)"
 #eval "$(pyenv virtualenv-init -)"
 
 

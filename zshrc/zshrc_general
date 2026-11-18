@@ -9,7 +9,7 @@ source $( dirname ${(%):-%N} )/zshrc_task_finished
 source $( dirname ${(%):-%N} )/zshrc_options
 source $( dirname ${(%):-%N} )/zshrc_context   # (client, worktree) context system
 export CLICOLOR=1
-export PYTHONSTARTUP=~/.python/startup.py
+# export PYTHONSTARTUP=~/.python/startup.py
 export USER_ID="$(id -u)"
 export GROUP_ID="$(id -g)"
 
